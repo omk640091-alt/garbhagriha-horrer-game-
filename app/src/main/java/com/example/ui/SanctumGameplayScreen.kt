@@ -116,7 +116,7 @@ fun SanctumGameplayScreen(
   sanityManager: SanityManager = remember(temple.id, initialShrineSave?.savedAtEpochMillis) {
     SanityManager(initialSanity = (initialShrineSave?.sanityPercent ?: 100).toFloat())
   },
-  encounterManager: EncounterManager = remember(temple.id) { EncounterManager() },
+  encounterManager: EncounterManager = remember(temple.id) { EncounterManager(initialX = 4.2, initialY = 1.5) },
   staminaManager: StaminaManager = remember(temple.id, initialShrineSave?.savedAtEpochMillis) {
     StaminaManager(initialStamina = (initialShrineSave?.staminaPercent ?: 100).toFloat())
   },

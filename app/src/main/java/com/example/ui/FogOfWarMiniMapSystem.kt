@@ -323,25 +323,25 @@ fun FogOfWarMiniMapOverlay(
 ) {
   Column(
     modifier = modifier
-      .width(120.dp)
-      .clip(RoundedCornerShape(14.dp))
-      .background(Color(0xE6100604))
-      .border(1.2.dp, MoltenBrass.copy(alpha = 0.65f), RoundedCornerShape(14.dp))
+      .width(96.dp)
+      .clip(RoundedCornerShape(12.dp))
+      .background(Color(0xDD100604))
+      .border(1.dp, MoltenBrass.copy(alpha = 0.65f), RoundedCornerShape(12.dp))
       .testTag("fog_of_war_minimap_overlay")
       .clickable { fogOfWarManager.openExpandedMap() }
-      .padding(6.dp),
+      .padding(4.dp),
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
     // Mini-Map Header Bar: Title + Exploration %
     Row(
       modifier = Modifier
         .fillMaxWidth()
-        .padding(bottom = 4.dp),
+        .padding(bottom = 2.dp),
       horizontalArrangement = Arrangement.SpaceBetween,
       verticalAlignment = Alignment.CenterVertically
     ) {
       Text(
-        text = "🗺 MANDALA",
+        text = "🗺 MAP",
         style = MaterialTheme.typography.labelSmall,
         color = MoltenBrass,
         fontWeight = FontWeight.Bold
@@ -357,8 +357,8 @@ fun FogOfWarMiniMapOverlay(
 
     Box(
       modifier = Modifier
-        .size(104.dp)
-        .clip(RoundedCornerShape(10.dp))
+        .size(82.dp)
+        .clip(RoundedCornerShape(8.dp))
         .background(Color(0xFF050201))
     ) {
       Canvas(modifier = Modifier.fillMaxSize()) {

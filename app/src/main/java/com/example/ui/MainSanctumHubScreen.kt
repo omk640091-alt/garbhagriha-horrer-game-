@@ -139,7 +139,7 @@ fun MainSanctumHubScreen(
 
   var currentTab by rememberSaveable { mutableIntStateOf(0) }
   var isTransitioningToSanctum by rememberSaveable { mutableStateOf(false) }
-  var inFirstPersonGameplay by rememberSaveable { mutableStateOf(false) }
+  var inFirstPersonGameplay by rememberSaveable { mutableStateOf(true) }
   var resumeFromShrineSave by rememberSaveable { mutableStateOf(false) }
 
   if (isTransitioningToSanctum) {

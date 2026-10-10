@@ -45,6 +45,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -210,194 +213,164 @@ fun FirstPersonSanctumHud(
     )
   )
 
+  var showTacticalDetails by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+
   Column(
     modifier = modifier
       .fillMaxWidth()
       .testTag("first_person_hud_root"),
-    verticalArrangement = Arrangement.spacedBy(8.dp)
+    verticalArrangement = Arrangement.spacedBy(4.dp)
   ) {
-    // 1. Top Vitals & Tactical Bar (Health, Sanity Meter, Diya Oil, Compass & Quick Toggles)
+    // 1. Sleek Top Vitals & Tactical Bar (Compact so 3D view & Character are clearly visible)
     Surface(
-      color = SanctumGranite.copy(alpha = 0.90f),
-      shape = RoundedCornerShape(18.dp),
+      color = SanctumGranite.copy(alpha = 0.78f),
+      shape = RoundedCornerShape(14.dp),
       modifier = Modifier
         .fillMaxWidth()
         .border(
-          width = 1.2.dp,
+          width = 1.dp,
           brush = Brush.horizontalGradient(
             colors = listOf(
               if (healthPercent <= 35 || sanityPercent <= 35) BloodAltarRed.copy(alpha = criticalPulse)
-              else MoltenBrass.copy(alpha = 0.55f),
-              SaffronFlame.copy(alpha = 0.45f),
-              MoltenBrass.copy(alpha = 0.55f)
+              else MoltenBrass.copy(alpha = 0.5f),
+              SaffronFlame.copy(alpha = 0.4f),
+              MoltenBrass.copy(alpha = 0.5f)
             )
           ),
-          shape = RoundedCornerShape(18.dp)
+          shape = RoundedCornerShape(14.dp)
         )
     ) {
-      Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
-        // Header Row: Temple Title and System Controls
+      Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)) {
+        // Header Row: Temple Title, Compact Vitals, and Quick Controls
         Row(
           modifier = Modifier.fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween,
           verticalAlignment = Alignment.CenterVertically
         ) {
-          Column(modifier = Modifier.weight(1f)) {
+          Row(
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+          ) {
             Text(
               text = temple.name.uppercase(),
               style = MaterialTheme.typography.labelLarge,
               color = MoltenBrass,
+              fontWeight = FontWeight.Bold,
               maxLines = 1,
               overflow = TextOverflow.Ellipsis
             )
             Text(
-              text = if (roomCode != null) "CO-OP [$roomCode] ($coOpPlayerCount) • ${currentAtmosphere.label} • ${currentSurfaceMaterial.displayName}"
-              else "${currentAtmosphere.label} • ${currentSurfaceMaterial.displayName} • Threat: ${"%.1f".format(entityDistance)}m",
-              style = MaterialTheme.typography.bodyMedium,
-              color = if (entityDistance < 3.6) BloodAltarRed else if (roomCode != null) SacredTeal else SandstoneMuted,
+              text = if (roomCode != null) "CO-OP [$roomCode] • ${"%.1f".format(entityDistance)}m"
+              else "👁 ${temple.entityName}: ${"%.1f".format(entityDistance)}m",
+              style = MaterialTheme.typography.labelSmall,
+              color = if (entityDistance < 3.6) BloodAltarRed else SaffronFlame,
               maxLines = 1,
               overflow = TextOverflow.Ellipsis
             )
           }
 
           Row(verticalAlignment = Alignment.CenterVertically) {
+            Surface(
+              color = SacredCardSurface,
+              shape = RoundedCornerShape(8.dp),
+              modifier = Modifier
+                .border(0.8.dp, MoltenBrass.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
+                .clickable { showTacticalDetails = !showTacticalDetails }
+                .padding(horizontal = 6.dp, vertical = 2.dp)
+            ) {
+              Text(
+                text = if (showTacticalDetails) "▲ HIDE HUD" else "▼ HUD INFO",
+                style = MaterialTheme.typography.labelSmall,
+                color = MoltenBrass
+              )
+            }
+
+            Spacer(modifier = Modifier.width(4.dp))
+
             IconButton(
               onClick = onToggleLanguage,
               modifier = Modifier
-                .size(32.dp)
+                .size(28.dp)
                 .testTag("toggle_language_button")
             ) {
               Icon(
                 imageVector = Icons.Default.Translate,
                 contentDescription = "Toggle Hindi / Sanskrit / English Language",
                 tint = if (isHindi) MantraJade else MoltenBrass,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(16.dp)
               )
             }
 
             IconButton(
               onClick = onToggleShake,
               modifier = Modifier
-                .size(32.dp)
+                .size(28.dp)
                 .testTag("toggle_shake_button")
             ) {
               Icon(
                 imageVector = Icons.Default.Vibration,
                 contentDescription = "Toggle Screen Shake and Haptics",
                 tint = if (isShakeEnabled) MoltenBrass else SandstoneMuted,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(16.dp)
               )
             }
 
             IconButton(
               onClick = onCyclePostProcess,
               modifier = Modifier
-                .size(32.dp)
+                .size(28.dp)
                 .testTag("cycle_post_process_button")
             ) {
               Icon(
                 imageVector = Icons.Default.AutoAwesome,
                 contentDescription = "Cycle Horror Post-Process FX Preset",
                 tint = SaffronFlame,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(16.dp)
               )
             }
 
             IconButton(
               onClick = onToggleMute,
               modifier = Modifier
-                .size(32.dp)
+                .size(28.dp)
                 .testTag("toggle_audio_button")
             ) {
               Icon(
                 imageVector = if (isMuted) Icons.Default.VolumeOff else Icons.Default.VolumeUp,
                 contentDescription = "Toggle Spatial Sound",
                 tint = MoltenBrass,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(16.dp)
               )
             }
 
             IconButton(
               onClick = onExitSanctum,
               modifier = Modifier
-                .size(32.dp)
+                .size(28.dp)
                 .testTag("exit_sanctum_button")
             ) {
               Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Exit Sanctum",
                 tint = ParchmentCream,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(16.dp)
               )
             }
           }
         }
 
-        Spacer(modifier = Modifier.height(6.dp))
-
-        // Full-Width Tactical Status Chips Row
-        @OptIn(ExperimentalLayoutApi::class)
-        FlowRow(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.spacedBy(6.dp),
-          verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-          CompassBearingChip(playerAngle = playerAngle)
-          FogOfWarCartographyChip(
-            explorationPercent = mapExplorationPercent,
-            isHindi = isHindi,
-            onClick = onOpenExpandedMap
-          )
-          GodsFavorHudChip(
-            favorScore = godsFavorScore,
-            standing = godsFavorStanding,
-            activeBuff = activeFavorBuff,
-            isHindi = isHindi,
-            onClick = onOpenGodsFavor
-          )
-          SurfaceMaterialChip(surfaceMaterial = currentSurfaceMaterial)
-          if (environmentalEffectState != EnvironmentalEffectState.STILL_AIR) {
-            EnvironmentalEffectChip(effectState = environmentalEffectState)
-          }
-          if (shakeIntensityState != ShakeIntensityState.STILL && isShakeEnabled) {
-            ScreenShakeChip(
-              shakeState = shakeIntensityState,
-              shakePercent = shakePercent
-            )
-          }
-          if (activeShadowCasters > 0 || torchShadowState == TorchShadowState.NO_TORCH_UMBRA) {
-            TorchShadowChip(
-              shadowState = torchShadowState,
-              casterCount = activeShadowCasters
-            )
-          }
-          if (ritualProgressState != RitualProgressState.DORMANT) {
-            RitualProgressChip(
-              progressState = ritualProgressState,
-              stepsCompleted = ritualStepsCompleted,
-              totalSteps = ritualTotalSteps
-            )
-          }
-          if (creatureProximityZone != CreatureProximityZone.OUT_OF_RANGE) {
-            CreatureAudioCueChip(
-              proximityZone = creatureProximityZone,
-              lastCue = lastCreatureAudioCue
-            )
-          }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
         // Vitals Row: Health (Prana), Sanity (Manas), Stamina (Sprint Energy), and Diya Oil
         Row(
           modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.spacedBy(8.dp),
+          horizontalArrangement = Arrangement.spacedBy(6.dp),
           verticalAlignment = Alignment.CenterVertically
         ) {
-          // HEALTH (PRANA VITALITY) METER
           VitalMeterColumn(
             icon = Icons.Default.Favorite,
-            label = "HEALTH",
+            label = "PRANA",
             valueText = "$healthPercent%",
             progress = healthPercent / 100f,
             activeColor = if (healthPercent > 35) MantraJade else BloodAltarRed.copy(alpha = criticalPulse),
@@ -405,7 +378,6 @@ fun FirstPersonSanctumHud(
             modifier = Modifier.weight(0.95f)
           )
 
-          // SANITY (MANAS / CITTA) METER + RADIAL THIRD-EYE GAUGE
           SanityMeterWidget(
             sanityPercent = sanityPercent,
             mentalState = mentalState,
@@ -416,7 +388,6 @@ fun FirstPersonSanctumHud(
               .testTag("hud_sanity_meter")
           )
 
-          // STAMINA (SPRINT EVASION ENERGY) METER
           VitalMeterColumn(
             icon = Icons.Default.DirectionsRun,
             label = when {
@@ -435,11 +406,10 @@ fun FirstPersonSanctumHud(
             modifier = Modifier.weight(0.95f)
           )
 
-          // DIYA TORCH FUEL & DYNAMIC LIGHT RADIUS METER
           VitalMeterColumn(
             icon = Icons.Default.LocalFireDepartment,
-            label = torchFlameState.hudLabel,
-            valueText = "${diyaOilPercent.roundToInt()}% (${"%.1f".format(torchLightRadiusTiles)}m)",
+            label = "DIYA",
+            valueText = "${diyaOilPercent.roundToInt()}%",
             progress = (diyaOilPercent / 100f).coerceIn(0f, 1f),
             activeColor = when (torchFlameState) {
               TorchFlameState.BLAZING_AGNI -> SaffronFlame
@@ -452,27 +422,71 @@ fun FirstPersonSanctumHud(
           )
         }
 
-        // Optional Psychological Whisper / Mental State Subtitle when sanity is affected
-        if (!sanityWhisper.isNullOrBlank() || sanityPercent < 70) {
-          Spacer(modifier = Modifier.height(6.dp))
-          Text(
-            text = sanityWhisper ?: "${mentalState.sanskritTerm} — ${mentalState.description}",
-            style = MaterialTheme.typography.labelLarge,
-            color = if (sanityPercent < 35) BloodAltarRed else SaffronFlame,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.testTag("hud_sanity_whisper_banner")
+        Spacer(modifier = Modifier.height(4.dp))
+
+        // Compact Single-Line Tactical Status Chips + Active Objective Pill
+        @OptIn(ExperimentalLayoutApi::class)
+        FlowRow(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.spacedBy(5.dp),
+          verticalArrangement = Arrangement.spacedBy(3.dp)
+        ) {
+          CompassBearingChip(playerAngle = playerAngle)
+          FogOfWarCartographyChip(
+            explorationPercent = mapExplorationPercent,
+            isHindi = isHindi,
+            onClick = onOpenExpandedMap
           )
+          GodsFavorHudChip(
+            favorScore = godsFavorScore,
+            standing = godsFavorStanding,
+            activeBuff = activeFavorBuff,
+            isHindi = isHindi,
+            onClick = onOpenGodsFavor
+          )
+          SurfaceMaterialChip(surfaceMaterial = currentSurfaceMaterial)
+          if (ritualProgressState != RitualProgressState.DORMANT) {
+            RitualProgressChip(
+              progressState = ritualProgressState,
+              stepsCompleted = ritualStepsCompleted,
+              totalSteps = ritualTotalSteps
+            )
+          }
+          if (showTacticalDetails) {
+            if (environmentalEffectState != EnvironmentalEffectState.STILL_AIR) {
+              EnvironmentalEffectChip(effectState = environmentalEffectState)
+            }
+            if (shakeIntensityState != ShakeIntensityState.STILL && isShakeEnabled) {
+              ScreenShakeChip(
+                shakeState = shakeIntensityState,
+                shakePercent = shakePercent
+              )
+            }
+            if (activeShadowCasters > 0 || torchShadowState == TorchShadowState.NO_TORCH_UMBRA) {
+              TorchShadowChip(
+                shadowState = torchShadowState,
+                casterCount = activeShadowCasters
+              )
+            }
+            if (creatureProximityZone != CreatureProximityZone.OUT_OF_RANGE) {
+              CreatureAudioCueChip(
+                proximityZone = creatureProximityZone,
+                lastCue = lastCreatureAudioCue
+              )
+            }
+          }
         }
       }
     }
 
-    // 2. Active Objective Indicators Tracker Panel
+    // 2. Compact / Collapsible Active Objective Indicators Tracker Panel
     ActiveObjectivesTrackerCard(
       objectives = objectives,
       entityName = temple.entityName,
       entityDistance = entityDistance,
-      creatureBehaviorState = creatureBehaviorState
+      creatureBehaviorState = creatureBehaviorState,
+      expanded = showTacticalDetails,
+      onToggleExpanded = { showTacticalDetails = !showTacticalDetails }
     )
   }
 }
@@ -489,8 +503,8 @@ private fun VitalMeterColumn(
 ) {
   Column(
     modifier = modifier
-      .background(ObsidianVoid.copy(alpha = 0.65f), RoundedCornerShape(10.dp))
-      .padding(horizontal = 8.dp, vertical = 6.dp)
+      .background(ObsidianVoid.copy(alpha = 0.65f), RoundedCornerShape(8.dp))
+      .padding(horizontal = 6.dp, vertical = 3.dp)
       .testTag(testTag)
   ) {
     Row(
@@ -503,31 +517,31 @@ private fun VitalMeterColumn(
           imageVector = icon,
           contentDescription = label,
           tint = activeColor,
-          modifier = Modifier.size(13.dp)
+          modifier = Modifier.size(11.dp)
         )
-        Spacer(modifier = Modifier.width(4.dp))
+        Spacer(modifier = Modifier.width(3.dp))
         Text(
           text = label,
-          style = MaterialTheme.typography.labelLarge,
+          style = MaterialTheme.typography.labelSmall,
           color = ParchmentCream
         )
       }
       Text(
         text = valueText,
-        style = MaterialTheme.typography.labelLarge,
+        style = MaterialTheme.typography.labelSmall,
         color = activeColor,
         fontWeight = FontWeight.Bold
       )
     }
-    Spacer(modifier = Modifier.height(4.dp))
+    Spacer(modifier = Modifier.height(2.dp))
     LinearProgressIndicator(
       progress = { progress.coerceIn(0f, 1f) },
       color = activeColor,
       trackColor = SacredCardSurface,
       modifier = Modifier
         .fillMaxWidth()
-        .height(6.dp)
-        .clip(RoundedCornerShape(4.dp))
+        .height(4.dp)
+        .clip(RoundedCornerShape(3.dp))
     )
   }
 }
@@ -553,46 +567,14 @@ private fun SanityMeterWidget(
   Row(
     verticalAlignment = Alignment.CenterVertically,
     modifier = modifier
-      .background(ObsidianVoid.copy(alpha = 0.65f), RoundedCornerShape(10.dp))
+      .background(ObsidianVoid.copy(alpha = 0.65f), RoundedCornerShape(8.dp))
       .border(
-        width = 1.dp,
+        width = 0.8.dp,
         color = sanityColor.copy(alpha = 0.45f),
-        shape = RoundedCornerShape(10.dp)
+        shape = RoundedCornerShape(8.dp)
       )
-      .padding(horizontal = 8.dp, vertical = 5.dp)
+      .padding(horizontal = 6.dp, vertical = 3.dp)
   ) {
-    // Radial Ajna (Third-Eye) Sanity Arc Gauge
-    Box(
-      contentAlignment = Alignment.Center,
-      modifier = Modifier.size(30.dp)
-    ) {
-      Canvas(modifier = Modifier.size(28.dp)) {
-        val strokeW = 3.5.dp.toPx()
-        drawArc(
-          color = SacredCardSurface,
-          startAngle = 135f,
-          sweepAngle = 270f,
-          useCenter = false,
-          style = Stroke(width = strokeW, cap = StrokeCap.Round)
-        )
-        drawArc(
-          color = sanityColor,
-          startAngle = 135f,
-          sweepAngle = 270f * (sanityPercent / 100f).coerceIn(0f, 1f),
-          useCenter = false,
-          style = Stroke(width = strokeW, cap = StrokeCap.Round)
-        )
-        // Center Third-Eye Bindu dot
-        drawCircle(
-          color = sanityColor,
-          radius = 3.5f,
-          center = Offset(size.width / 2f, size.height / 2f)
-        )
-      }
-    }
-
-    Spacer(modifier = Modifier.width(6.dp))
-
     Column(modifier = Modifier.weight(1f)) {
       Row(
         modifier = Modifier.fillMaxWidth(),
@@ -604,24 +586,24 @@ private fun SanityMeterWidget(
             imageVector = Icons.Default.Psychology,
             contentDescription = "Sanity Meter",
             tint = sanityColor,
-            modifier = Modifier.size(13.dp)
+            modifier = Modifier.size(11.dp)
           )
           Spacer(modifier = Modifier.width(3.dp))
           Text(
             text = sanityStatus,
-            style = MaterialTheme.typography.labelLarge,
+            style = MaterialTheme.typography.labelSmall,
             color = ParchmentCream
           )
         }
         Text(
           text = "$sanityPercent%",
-          style = MaterialTheme.typography.labelLarge,
+          style = MaterialTheme.typography.labelSmall,
           color = sanityColor,
           fontWeight = FontWeight.Bold
         )
       }
 
-      Spacer(modifier = Modifier.height(3.dp))
+      Spacer(modifier = Modifier.height(2.dp))
 
       LinearProgressIndicator(
         progress = { (sanityPercent / 100f).coerceIn(0f, 1f) },
@@ -629,7 +611,7 @@ private fun SanityMeterWidget(
         trackColor = SacredCardSurface,
         modifier = Modifier
           .fillMaxWidth()
-          .height(5.dp)
+          .height(4.dp)
           .clip(RoundedCornerShape(3.dp))
       )
     }
@@ -641,34 +623,54 @@ private fun ActiveObjectivesTrackerCard(
   objectives: List<SanctumObjectiveItem>,
   entityName: String,
   entityDistance: Double,
-  creatureBehaviorState: CreatureBehaviorState
+  creatureBehaviorState: CreatureBehaviorState,
+  expanded: Boolean = false,
+  onToggleExpanded: () -> Unit = {}
 ) {
   Surface(
-    color = SanctumGranite.copy(alpha = 0.84f),
-    shape = RoundedCornerShape(14.dp),
+    color = SanctumGranite.copy(alpha = 0.72f),
+    shape = RoundedCornerShape(10.dp),
     modifier = Modifier
       .fillMaxWidth()
-      .border(1.dp, MoltenBrass.copy(alpha = 0.35f), RoundedCornerShape(14.dp))
+      .border(0.8.dp, MoltenBrass.copy(alpha = 0.35f), RoundedCornerShape(10.dp))
       .testTag("hud_active_objectives_card")
   ) {
-    Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
-      Row(
+    Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
+      @OptIn(ExperimentalLayoutApi::class)
+      FlowRow(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp)
       ) {
         Text(
-          text = "ACTIVE SANCTUM OBJECTIVES",
-          style = MaterialTheme.typography.labelLarge,
-          color = MoltenBrass
+          text = if (expanded) "▼ MISSIONS" else "▶ MISSIONS:",
+          style = MaterialTheme.typography.labelSmall,
+          color = MoltenBrass,
+          fontWeight = FontWeight.Bold,
+          modifier = Modifier.clickable { onToggleExpanded() }
         )
+        objectives.forEach { obj ->
+          val badgeColor = if (obj.isCompleted) MantraJade else if (obj.isPrimary) SaffronFlame else ParchmentCream
+          Text(
+            text = when (obj.id) {
+              "obj_diyas" -> "🪔${obj.progressText}"
+              "obj_seals" -> "🕉${obj.progressText}"
+              "obj_secret_ritual" -> "🗝${obj.progressText}"
+              else -> "🚪${obj.progressText}"
+            },
+            style = MaterialTheme.typography.labelSmall,
+            color = badgeColor,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.testTag(if (!expanded) "objective_indicator_${obj.id}" else "compact_badge_${obj.id}")
+          )
+        }
         Text(
           text = if (entityDistance < 3.8 || creatureBehaviorState == CreatureBehaviorState.FRENZIED_CHASE) {
             "⚠ ${entityName.uppercase()} [${creatureBehaviorState.badgeLabel}]"
           } else {
             "👁 ${creatureBehaviorState.badgeLabel} • ${"%.1f".format(entityDistance)}m"
           },
-          style = MaterialTheme.typography.labelLarge,
+          style = MaterialTheme.typography.labelSmall,
           color = when (creatureBehaviorState) {
             CreatureBehaviorState.FRENZIED_CHASE, CreatureBehaviorState.SANITY_AMBUSH -> BloodAltarRed
             CreatureBehaviorState.STUNNED_BY_NADA -> MantraJade
@@ -679,54 +681,47 @@ private fun ActiveObjectivesTrackerCard(
         )
       }
 
-      Spacer(modifier = Modifier.height(4.dp))
-
-      objectives.forEach { obj ->
-        val rowColor = when {
-          obj.isCompleted -> MantraJade
-          obj.isPrimary -> SaffronFlame
-          else -> ParchmentCream.copy(alpha = 0.85f)
-        }
-        Row(
-          modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 2.dp)
-            .testTag("objective_indicator_${obj.id}"),
-          horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically
-        ) {
-          Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.weight(1f)
-          ) {
-            Icon(
-              imageVector = if (obj.isCompleted) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
-              contentDescription = obj.title,
-              tint = rowColor,
-              modifier = Modifier.size(14.dp)
-            )
-            Spacer(modifier = Modifier.width(6.dp))
-            Text(
-              text = obj.title,
-              style = MaterialTheme.typography.bodyMedium,
-              color = rowColor,
-              fontWeight = if (obj.isPrimary || obj.isCompleted) FontWeight.Bold else FontWeight.Normal,
-              maxLines = 1,
-              overflow = TextOverflow.Ellipsis
-            )
+      if (expanded) {
+        Spacer(modifier = Modifier.height(4.dp))
+        objectives.forEach { obj ->
+          val rowColor = when {
+            obj.isCompleted -> MantraJade
+            obj.isPrimary -> SaffronFlame
+            else -> ParchmentCream.copy(alpha = 0.85f)
           }
-
-          Spacer(modifier = Modifier.width(8.dp))
-
-          Surface(
-            color = ObsidianVoid.copy(alpha = 0.75f),
-            shape = RoundedCornerShape(6.dp)
+          Row(
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(vertical = 1.dp)
+              .testTag("objective_indicator_${obj.id}"),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
           ) {
+            Row(
+              verticalAlignment = Alignment.CenterVertically,
+              modifier = Modifier.weight(1f)
+            ) {
+              Icon(
+                imageVector = if (obj.isCompleted) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
+                contentDescription = obj.title,
+                tint = rowColor,
+                modifier = Modifier.size(12.dp)
+              )
+              Spacer(modifier = Modifier.width(4.dp))
+              Text(
+                text = obj.title,
+                style = MaterialTheme.typography.labelSmall,
+                color = rowColor,
+                fontWeight = if (obj.isPrimary || obj.isCompleted) FontWeight.Bold else FontWeight.Normal,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+              )
+            }
             Text(
               text = obj.progressText,
-              style = MaterialTheme.typography.labelLarge,
+              style = MaterialTheme.typography.labelSmall,
               color = rowColor,
-              modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+              fontWeight = FontWeight.Bold
             )
           }
         }

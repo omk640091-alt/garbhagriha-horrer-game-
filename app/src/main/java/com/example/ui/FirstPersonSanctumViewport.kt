@@ -91,15 +91,15 @@ fun FirstPersonSanctumViewport(
       val halfH = h * 0.5f
 
       // Dynamic Torch / Diya illumination reach driven by TorchLightManager
-      val lightReach = torchLightRadiusTiles.coerceIn(2.0f, 9.5f)
+      val lightReach = torchLightRadiusTiles.coerceIn(3.5f, 10.5f)
 
-      // 1. Ceiling & Floor atmospheric gradients
+      // 1. Ceiling & Floor atmospheric gradients (brightened warm sandstone & granite so corridors are clearly visible)
       drawRect(
         brush = Brush.verticalGradient(
           colors = listOf(
-            Color(0xFF140804),
-            Color(0xFF090302),
-            Color(0xFF030101)
+            Color(0xFF2B140B),
+            Color(0xFF1A0B06),
+            Color(0xFF0E0503)
           ),
           startY = 0f,
           endY = halfH
@@ -111,9 +111,9 @@ fun FirstPersonSanctumViewport(
       drawRect(
         brush = Brush.verticalGradient(
           colors = listOf(
-            Color(0xFF030101),
-            Color(0xFF120805),
-            Color(0xFF24110A)
+            Color(0xFF120704),
+            Color(0xFF28130B),
+            Color(0xFF422012)
           ),
           startY = halfH,
           endY = h
@@ -655,16 +655,47 @@ private fun DrawScope.drawSpriteBillboard(
     }
 
     SpriteType.TEAMMATE -> {
-      val r = spriteSize * 0.25f
+      val r = spriteSize * 0.28f
+      val bob = sin(animTick * 4.5f) * (spriteSize * 0.02f)
+      val cy = centerY + bob
+      // Golden Prana halo
       drawCircle(
-        color = Color(0xFF00E5FF).copy(alpha = 0.75f * fade),
-        radius = r,
-        center = Offset(screenX, centerY)
+        brush = Brush.radialGradient(
+          colors = listOf(
+            Color(0xFFFFCA28).copy(alpha = 0.65f * fade),
+            Color(0xFF00E5FF).copy(alpha = 0.25f * fade),
+            Color.Transparent
+          ),
+          center = Offset(screenX, cy),
+          radius = r * 1.9f
+        ),
+        radius = r * 1.9f,
+        center = Offset(screenX, cy)
+      )
+      // Saffron Sadhaka robe torso
+      drawRoundRect(
+        color = Color(0xFFFF6D00).copy(alpha = 0.95f * fade),
+        topLeft = Offset(screenX - r * 0.55f, cy - r * 0.15f),
+        size = Size(r * 1.1f, r * 1.35f),
+        cornerRadius = CornerRadius(r * 0.35f, r * 0.35f)
+      )
+      // Gold Angavastram sash
+      drawLine(
+        color = Color(0xFFFFEA00).copy(alpha = fade),
+        start = Offset(screenX - r * 0.45f, cy - r * 0.10f),
+        end = Offset(screenX + r * 0.45f, cy + r * 0.85f),
+        strokeWidth = (r * 0.18f).coerceAtLeast(3f)
+      )
+      // Sadhaka head + glowing Tilak on forehead
+      drawCircle(
+        color = Color(0xFFFFCC80).copy(alpha = fade),
+        radius = r * 0.42f,
+        center = Offset(screenX, cy - r * 0.48f)
       )
       drawCircle(
-        color = Color(0xFFFFCA28).copy(alpha = fade),
-        radius = r * 0.45f,
-        center = Offset(screenX, centerY - r * 0.3f)
+        color = Color(0xFFFF1744).copy(alpha = fade),
+        radius = (r * 0.10f).coerceAtLeast(2.5f),
+        center = Offset(screenX, cy - r * 0.52f)
       )
     }
 
@@ -726,71 +757,84 @@ private fun DrawScope.drawSpriteBillboard(
     }
 
     SpriteType.CREATURE -> {
-      // Towering Brahmarakshasa / Chhaya Pret shadow entity with glowing crimson-amber eyes and horns
+      // Towering Brahmarakshasa / Chhaya Pret shadow entity with glowing crimson-amber aura, crown/horns, and third eye
       val bob = sin(animTick * 6f) * (spriteSize * 0.03f)
-      val bodyW = spriteSize * 0.55f
-      val bodyH = spriteSize * 0.88f
+      val bodyW = spriteSize * 0.58f
+      val bodyH = spriteSize * 0.90f
       val cy = centerY + bob
 
-      // Dark smoke aura
+      // Fiery Crimson & Shadow Aura so creature stands out clearly against dark corridors
       drawCircle(
         brush = Brush.radialGradient(
           colors = listOf(
-            Color(0xFF1A0000).copy(alpha = 0.92f * fade),
-            Color(0xFFD50000).copy(alpha = 0.35f * fade),
+            Color(0xFFFF1744).copy(alpha = 0.65f * fade),
+            Color(0xFFD50000).copy(alpha = 0.38f * fade),
             Color.Transparent
           ),
           center = Offset(screenX, cy),
-          radius = bodyH * 0.65f
+          radius = bodyH * 0.72f
         ),
-        radius = bodyH * 0.65f,
+        radius = bodyH * 0.72f,
         center = Offset(screenX, cy)
       )
 
-      // Torso silhouette
+      // Torso silhouette with crimson-gold ritual armor outline
       drawRoundRect(
-        color = Color(0xFF0D0303).copy(alpha = 0.96f * fade),
+        color = Color(0xFF1F0606).copy(alpha = 0.96f * fade),
         topLeft = Offset(screenX - bodyW / 2f, cy - bodyH * 0.38f),
-        size = Size(bodyW, bodyH * 0.76f),
+        size = Size(bodyW, bodyH * 0.78f),
         cornerRadius = CornerRadius(bodyW * 0.3f, bodyW * 0.3f)
       )
+      drawRoundRect(
+        color = Color(0xFFFF5252).copy(alpha = 0.82f * fade),
+        topLeft = Offset(screenX - bodyW / 2f, cy - bodyH * 0.38f),
+        size = Size(bodyW, bodyH * 0.78f),
+        cornerRadius = CornerRadius(bodyW * 0.3f, bodyW * 0.3f),
+        style = Stroke(width = 3f)
+      )
 
-      // Horns
+      // Horns & Crown
       val hornPath = Path().apply {
         moveTo(screenX - bodyW * 0.22f, cy - bodyH * 0.35f)
-        lineTo(screenX - bodyW * 0.42f, cy - bodyH * 0.56f)
-        lineTo(screenX - bodyW * 0.10f, cy - bodyH * 0.40f)
+        lineTo(screenX - bodyW * 0.44f, cy - bodyH * 0.58f)
+        lineTo(screenX - bodyW * 0.08f, cy - bodyH * 0.40f)
         close()
         moveTo(screenX + bodyW * 0.22f, cy - bodyH * 0.35f)
-        lineTo(screenX + bodyW * 0.42f, cy - bodyH * 0.56f)
-        lineTo(screenX + bodyW * 0.10f, cy - bodyH * 0.40f)
+        lineTo(screenX + bodyW * 0.44f, cy - bodyH * 0.58f)
+        lineTo(screenX + bodyW * 0.08f, cy - bodyH * 0.40f)
         close()
       }
-      drawPath(hornPath, color = Color(0xFF3E1C14).copy(alpha = fade))
+      drawPath(hornPath, color = Color(0xFFFF8F00).copy(alpha = fade))
 
-      // Glowing eyes
-      val eyeOffset = bodyW * 0.13f
+      // Glowing eyes + Third Eye
+      val eyeOffset = bodyW * 0.14f
       val eyeY = cy - bodyH * 0.24f
-      val eyeRadius = (spriteSize * 0.035f).coerceAtLeast(3.5f)
+      val eyeRadius = (spriteSize * 0.04f).coerceAtLeast(4.5f)
       drawCircle(
-        color = Color(0xFFFF3D00),
-        radius = eyeRadius * 1.6f,
+        color = Color(0xFFFF1744),
+        radius = eyeRadius * 1.8f,
         center = Offset(screenX - eyeOffset, eyeY)
       )
       drawCircle(
-        color = Color(0xFFFF3D00),
-        radius = eyeRadius * 1.6f,
+        color = Color(0xFFFF1744),
+        radius = eyeRadius * 1.8f,
         center = Offset(screenX + eyeOffset, eyeY)
       )
       drawCircle(
         color = Color(0xFFFFEA00),
-        radius = eyeRadius * 0.7f,
+        radius = eyeRadius * 0.85f,
         center = Offset(screenX - eyeOffset, eyeY)
       )
       drawCircle(
         color = Color(0xFFFFEA00),
-        radius = eyeRadius * 0.7f,
+        radius = eyeRadius * 0.85f,
         center = Offset(screenX + eyeOffset, eyeY)
+      )
+      // Forehead Third Eye
+      drawCircle(
+        color = Color(0xFFFFAB00),
+        radius = eyeRadius * 0.9f,
+        center = Offset(screenX, eyeY - eyeRadius * 1.9f)
       )
     }
   }
@@ -805,17 +849,34 @@ private fun DrawScope.drawFirstPersonDiyaHand(
   chantingMantra: Boolean,
   animTick: Float
 ) {
-  val swayX = cos(animTick * 3.5f) * 10f
-  val swayY = abs(sin(animTick * 3.5f)) * 8f
-  val lampX = w * 0.78f + swayX
-  val lampY = h * 0.84f + swayY
+  val swayX = cos(animTick * 3.8f) * 8f
+  val swayY = abs(sin(animTick * 3.8f)) * 6f
+  val rightHandX = w * 0.74f + swayX
+  val rightHandY = h * 0.66f + swayY
+  val leftHandX = w * 0.26f - swayX * 0.7f
+  val leftHandY = h * 0.68f + swayY * 0.7f
+
+  // 1. Center Reticle / Third-Eye Aim Crosshair
+  val cx = w * 0.5f
+  val cy = h * 0.45f
+  drawCircle(
+    color = Color(0xFFFFCA28).copy(alpha = 0.75f),
+    radius = 10f,
+    center = Offset(cx, cy),
+    style = Stroke(width = 1.8f)
+  )
+  drawCircle(
+    color = Color(0xFFFFEA00).copy(alpha = 0.95f),
+    radius = 3f,
+    center = Offset(cx, cy)
+  )
 
   if (chantingMantra) {
     // Golden Vedic Kavach ring around viewport
     drawCircle(
       brush = Brush.radialGradient(
         colors = listOf(
-          Color(0xFFFFCA28).copy(alpha = 0.28f),
+          Color(0xFFFFCA28).copy(alpha = 0.30f),
           Color.Transparent
         ),
         center = Offset(w * 0.5f, h * 0.5f),
@@ -826,41 +887,203 @@ private fun DrawScope.drawFirstPersonDiyaHand(
     )
   }
 
-  if (diyaLit) {
-    val scale = (0.42f + 0.58f * lightRadiusNormalized.coerceIn(0.18f, 1.0f)) * flickerMultiplier
-    val flameRadius = (82f * scale).coerceAtLeast(24f)
-    drawCircle(
-      brush = Brush.radialGradient(
-        colors = listOf(
-          Color(0xFFFFF176).copy(alpha = (0.88f * scale).coerceIn(0.25f, 0.92f)),
-          Color(0xFFFF8F00).copy(alpha = (0.48f * scale).coerceIn(0.15f, 0.55f)),
-          Color.Transparent
-        ),
-        center = Offset(lampX, lampY - 28f),
-        radius = flameRadius * 2.3f
+  // 2. Visible Sadhaka Player Character Avatar in Center-Foreground (Third-Person Over-Shoulder Character Silhouette & Robes)
+  val charX = w * 0.50f + swayX * 0.45f
+  val charY = h * 0.66f + swayY * 0.55f
+  val charScale = (h * 0.0011f).coerceIn(0.65f, 1.35f)
+
+  // Character Prana Halo behind head & shoulders
+  drawCircle(
+    brush = Brush.radialGradient(
+      colors = listOf(
+        if (chantingMantra) Color(0xFF00E676).copy(alpha = 0.50f) else Color(0xFFFFAB00).copy(alpha = 0.36f),
+        Color.Transparent
       ),
-      radius = flameRadius * 2.3f,
-      center = Offset(lampX, lampY - 28f)
-    )
-    // Inner flame teardrop scaled by fuel & flicker
+      center = Offset(charX, charY - 68f * charScale),
+      radius = 95f * charScale
+    ),
+    radius = 95f * charScale,
+    center = Offset(charX, charY - 68f * charScale)
+  )
+
+  // Sadhaka Saffron Kurta / Dhoti Torso
+  drawRoundRect(
+    brush = Brush.verticalGradient(
+      colors = listOf(
+        Color(0xFFFF6D00),
+        Color(0xFFE65100),
+        Color(0xFFBF360C)
+      ),
+      startY = charY - 46f * charScale,
+      endY = charY + 86f * charScale
+    ),
+    topLeft = Offset(charX - 46f * charScale, charY - 46f * charScale),
+    size = Size(92f * charScale, 128f * charScale),
+    cornerRadius = CornerRadius(26f * charScale, 26f * charScale)
+  )
+  drawRoundRect(
+    color = Color(0xFFFFCA28).copy(alpha = 0.85f),
+    topLeft = Offset(charX - 46f * charScale, charY - 46f * charScale),
+    size = Size(92f * charScale, 128f * charScale),
+    cornerRadius = CornerRadius(26f * charScale, 26f * charScale),
+    style = Stroke(width = 2.4f)
+  )
+
+  // Sacred Yajnopavita (Janeu) & Golden Angavastram Sash across torso
+  drawLine(
+    color = Color(0xFFFFF59D),
+    start = Offset(charX - 36f * charScale, charY - 40f * charScale),
+    end = Offset(charX + 36f * charScale, charY + 55f * charScale),
+    strokeWidth = 6f * charScale
+  )
+
+  // Rudraksha Kantha Mala around neck
+  for (i in -3..3) {
     drawCircle(
-      color = Color(0xFFFFFDE7),
-      radius = (17f * scale).coerceAtLeast(6f),
-      center = Offset(lampX, lampY - 24f)
+      color = Color(0xFF4E342E),
+      radius = 4.8f * charScale,
+      center = Offset(charX + i * 8.5f * charScale, charY - 42f * charScale + abs(i) * 2.2f * charScale)
     )
   }
 
-  // Brass Diya bowl in player's hand
+  // Sadhaka Head, Shikha Topknot & Glowing Vibhuti Tripundra Tilak
+  drawCircle(
+    color = Color(0xFFE5A975),
+    radius = 30f * charScale,
+    center = Offset(charX, charY - 78f * charScale)
+  )
+  drawCircle(
+    color = Color(0xFF2D160E),
+    radius = 28f * charScale,
+    center = Offset(charX, charY - 82f * charScale)
+  )
+  // Topknot (Shikha)
+  drawCircle(
+    color = Color(0xFF1E0D07),
+    radius = 11f * charScale,
+    center = Offset(charX, charY - 110f * charScale)
+  )
+  // Glowing Saffron/Gold Band & Red Kumkum Tilak on back/crown aura
+  drawLine(
+    color = Color(0xFFFFEA00),
+    start = Offset(charX - 18f * charScale, charY - 84f * charScale),
+    end = Offset(charX + 18f * charScale, charY - 84f * charScale),
+    strokeWidth = 3f * charScale
+  )
+  drawCircle(
+    color = Color(0xFFFF1744),
+    radius = 4.5f * charScale,
+    center = Offset(charX, charY - 84f * charScale)
+  )
+
+  // 3. Left Character Forearm & Rudraksha Wrist Mala
+  val leftArmPath = Path().apply {
+    moveTo(leftHandX - 58f, h * 0.92f)
+    lineTo(leftHandX - 18f, leftHandY)
+    lineTo(leftHandX + 24f, leftHandY + 8f)
+    lineTo(leftHandX + 6f, h * 0.92f)
+    close()
+  }
+  drawPath(leftArmPath, color = Color(0xFFD99B66))
+  drawRoundRect(
+    color = Color(0xFFE65100),
+    topLeft = Offset(leftHandX - 42f, leftHandY + 42f),
+    size = Size(58f, 65f),
+    cornerRadius = CornerRadius(12f, 12f)
+  )
+  for (b in -2..2) {
+    drawCircle(
+      color = Color(0xFF5D4037),
+      radius = 5.5f,
+      center = Offset(leftHandX + b * 7.5f, leftHandY + 26f)
+    )
+  }
+  drawRoundRect(
+    color = Color(0xFFE5A975),
+    topLeft = Offset(leftHandX - 16f, leftHandY - 24f),
+    size = Size(36f, 44f),
+    cornerRadius = CornerRadius(14f, 14f)
+  )
+  if (chantingMantra) {
+    drawCircle(
+      brush = Brush.radialGradient(
+        colors = listOf(
+          Color(0xFF00E676).copy(alpha = 0.75f),
+          Color.Transparent
+        ),
+        center = Offset(leftHandX, leftHandY - 10f),
+        radius = 52f
+      ),
+      radius = 52f,
+      center = Offset(leftHandX, leftHandY - 10f)
+    )
+  }
+
+  // 4. Right Character Forearm holding the Sacred Ashtadhatu Brass Diya
+  val rightArmPath = Path().apply {
+    moveTo(rightHandX + 58f, h * 0.92f)
+    lineTo(rightHandX + 20f, rightHandY + 8f)
+    lineTo(rightHandX - 22f, rightHandY + 14f)
+    lineTo(rightHandX - 4f, h * 0.92f)
+    close()
+  }
+  drawPath(rightArmPath, color = Color(0xFFD99B66))
+  drawRoundRect(
+    color = Color(0xFFE65100),
+    topLeft = Offset(rightHandX - 14f, rightHandY + 36f),
+    size = Size(62f, 70f),
+    cornerRadius = CornerRadius(12f, 12f)
+  )
+
+  if (diyaLit) {
+    val scale = (0.50f + 0.50f * lightRadiusNormalized.coerceIn(0.18f, 1.0f)) * flickerMultiplier
+    val flameRadius = (86f * scale).coerceAtLeast(28f)
+    drawCircle(
+      brush = Brush.radialGradient(
+        colors = listOf(
+          Color(0xFFFFF176).copy(alpha = (0.90f * scale).coerceIn(0.30f, 0.94f)),
+          Color(0xFFFF8F00).copy(alpha = (0.52f * scale).coerceIn(0.18f, 0.60f)),
+          Color.Transparent
+        ),
+        center = Offset(rightHandX, rightHandY - 28f),
+        radius = flameRadius * 2.2f
+      ),
+      radius = flameRadius * 2.2f,
+      center = Offset(rightHandX, rightHandY - 28f)
+    )
+    val flamePath = Path().apply {
+      moveTo(rightHandX, rightHandY - 58f * scale)
+      cubicTo(
+        rightHandX + 22f * scale, rightHandY - 32f * scale,
+        rightHandX + 18f * scale, rightHandY - 8f,
+        rightHandX, rightHandY - 6f
+      )
+      cubicTo(
+        rightHandX - 18f * scale, rightHandY - 8f,
+        rightHandX - 22f * scale, rightHandY - 32f * scale,
+        rightHandX, rightHandY - 58f * scale
+      )
+      close()
+    }
+    drawPath(flamePath, color = Color(0xFFFF9100))
+    drawCircle(
+      color = Color(0xFFFFFDE7),
+      radius = (15f * scale).coerceAtLeast(6f),
+      center = Offset(rightHandX, rightHandY - 22f)
+    )
+  }
+
+  // Brass Diya bowl in player's right hand
   drawRoundRect(
     color = Color(0xFFB8860B),
-    topLeft = Offset(lampX - 44f, lampY - 8f),
-    size = Size(88f, 34f),
-    cornerRadius = CornerRadius(18f, 18f)
+    topLeft = Offset(rightHandX - 46f, rightHandY - 8f),
+    size = Size(92f, 32f),
+    cornerRadius = CornerRadius(16f, 16f)
   )
   drawRoundRect(
     color = Color(0xFFFFCA28),
-    topLeft = Offset(lampX - 36f, lampY - 4f),
-    size = Size(72f, 10f),
+    topLeft = Offset(rightHandX - 38f, rightHandY - 4f),
+    size = Size(76f, 10f),
     cornerRadius = CornerRadius(8f, 8f)
   )
 }

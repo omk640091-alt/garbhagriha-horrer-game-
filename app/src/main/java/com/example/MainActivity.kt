@@ -6,6 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ui.AuthScreen
 import com.example.ui.MainSanctumHubScreen
@@ -41,19 +44,22 @@ internal fun FirebaseAuth.authStateFlow(): Flow<FirebaseUser?> = callbackFlow {
 @Composable
 fun AppNavigation(auth: FirebaseAuth = Firebase.auth) {
   val currentUser by auth.authStateFlow().collectAsStateWithLifecycle(initialValue = auth.currentUser)
+  var localSadhakaActive by androidx.compose.runtime.saveable.rememberSaveable {
+    androidx.compose.runtime.mutableStateOf(false)
+  }
   val user = currentUser
-  if (user == null) {
+  if (user == null && !localSadhakaActive) {
     AuthScreen(
       onAuthSuccess = {
-        // AuthStateListener automatically updates currentUser
+        localSadhakaActive = true
       }
     )
   } else {
     MainSanctumHubScreen(
-      currentUserId = user.uid,
-      defaultDisplayName = user.displayName ?: user.email?.substringBefore("@") ?: "Sadhaka",
+      currentUserId = user?.uid ?: "sadhaka_local_explorer",
+      defaultDisplayName = user?.displayName ?: user?.email?.substringBefore("@") ?: "Sadhaka",
       onSignOut = {
-        // Handled by AuthStateListener
+        localSadhakaActive = false
       }
     )
   }

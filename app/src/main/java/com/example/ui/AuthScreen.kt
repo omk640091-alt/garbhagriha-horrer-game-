@@ -381,11 +381,34 @@ fun AuthScreen(
               )
             } else {
               Text(
-                text = "Sign in with Google to Enter Sanctum",
+                text = "Sign in with Google (Cloud & Co-Op)",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
               )
             }
+          }
+
+          Spacer(modifier = Modifier.height(10.dp))
+
+          Button(
+            onClick = {
+              onAuthSuccess()
+            },
+            colors = ButtonDefaults.buttonColors(
+              containerColor = MoltenBrass,
+              contentColor = Color(0xFF1A0800)
+            ),
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier
+              .fillMaxWidth()
+              .height(54.dp)
+              .testTag("instant_start_game_button")
+          ) {
+            Text(
+              text = "▶ PLAY 3D GAME NOW (START SOLO)",
+              style = MaterialTheme.typography.titleMedium,
+              fontWeight = FontWeight.Bold
+            )
           }
         }
       }

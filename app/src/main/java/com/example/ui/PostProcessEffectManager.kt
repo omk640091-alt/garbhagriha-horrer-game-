@@ -31,23 +31,23 @@ enum class PostProcessPreset(
 ) {
   SUBTLE_SANCTUM(
     label = "Sanctum Grit",
-    baseGrainDensity = 0.35f,
-    baseVignetteStrength = 0.45f,
-    scanlineIntensity = 0.12f,
+    baseGrainDensity = 0.25f,
+    baseVignetteStrength = 0.22f,
+    scanlineIntensity = 0.08f,
     emberParticlesEnabled = true
   ),
   CURSED_VHS(
     label = "Cursed Prana Film",
-    baseGrainDensity = 0.72f,
-    baseVignetteStrength = 0.68f,
-    scanlineIntensity = 0.32f,
+    baseGrainDensity = 0.50f,
+    baseVignetteStrength = 0.36f,
+    scanlineIntensity = 0.20f,
     emberParticlesEnabled = true
   ),
   ABYSSAL_DARKNESS(
     label = "Abyssal Eclipse",
-    baseGrainDensity = 0.50f,
-    baseVignetteStrength = 0.85f,
-    scanlineIntensity = 0.18f,
+    baseGrainDensity = 0.35f,
+    baseVignetteStrength = 0.52f,
+    scanlineIntensity = 0.12f,
     emberParticlesEnabled = false
   )
 }
@@ -66,16 +66,16 @@ class PostProcessEffectManager(
   var isEnabled by mutableStateOf(true)
     private set
 
-  var computedVignetteRadiusRatio by mutableFloatStateOf(0.72f)
+  var computedVignetteRadiusRatio by mutableFloatStateOf(0.82f)
     private set
 
   var computedCrimsonPulseAlpha by mutableFloatStateOf(0f)
     private set
 
-  var computedShadowVignetteAlpha by mutableFloatStateOf(0.55f)
+  var computedShadowVignetteAlpha by mutableFloatStateOf(0.25f)
     private set
 
-  var computedGrainIntensity by mutableFloatStateOf(0.35f)
+  var computedGrainIntensity by mutableFloatStateOf(0.25f)
     private set
 
   var computedDistortionGlitch by mutableFloatStateOf(0f)
@@ -107,15 +107,15 @@ class PostProcessEffectManager(
     val proximityThreat = ((5.2f - entityDistance.toFloat()) / 5.2f).coerceIn(0f, 1f)
     val lowPranaStress = ((50f - prana.toFloat()) / 50f).coerceIn(0f, 1f)
     // Dynamic darkness penalty scales continuously as torch fuel & light radius shrink
-    val darknessPenalty = ((1.0f - lightRadiusNormalized.coerceIn(0.18f, 1.0f)) * 0.34f)
+    val darknessPenalty = ((1.0f - lightRadiusNormalized.coerceIn(0.18f, 1.0f)) * 0.24f)
 
     val heartbeatWave = 0.78f + 0.22f * sin(animTick * 11.5f)
 
-    computedVignetteRadiusRatio = (0.84f - proximityThreat * 0.26f - darknessPenalty * 0.55f)
-      .coerceIn(0.30f, 0.85f)
+    computedVignetteRadiusRatio = (0.88f - proximityThreat * 0.18f - darknessPenalty * 0.35f)
+      .coerceIn(0.45f, 0.90f)
 
-    computedShadowVignetteAlpha = (preset.baseVignetteStrength + darknessPenalty + proximityThreat * 0.22f)
-      .coerceIn(0.25f, 0.95f)
+    computedShadowVignetteAlpha = (preset.baseVignetteStrength + darknessPenalty + proximityThreat * 0.18f)
+      .coerceIn(0.15f, 0.72f)
 
     computedCrimsonPulseAlpha = if (chantingMantra) {
       0f
@@ -149,12 +149,12 @@ class PostProcessEffectManager(
     val maxDim = maxOf(w, h)
     val center = Offset(w * 0.5f, h * 0.5f)
 
-    // 1. Deep Obsidian Edge Vignette (narrows field of view in darkness or during chases)
+    // 1. Subtle Obsidian Edge Vignette (keeps center 3D viewport and characters bright and clear)
     drawRect(
       brush = Brush.radialGradient(
         colorStops = arrayOf(
           0.0f to Color.Transparent,
-          (computedVignetteRadiusRatio * 0.65f).coerceIn(0.15f, 0.75f) to Color.Transparent,
+          (computedVignetteRadiusRatio * 0.78f).coerceIn(0.35f, 0.85f) to Color.Transparent,
           1.0f to Color(0xFF040100).copy(alpha = computedShadowVignetteAlpha)
         ),
         center = center,
