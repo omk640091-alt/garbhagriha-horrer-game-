@@ -72,6 +72,7 @@ jobs:
           path: |
             app/build/outputs/apk/debug/app-debug.apk
             app/build/outputs/apk/release/app-release.apk
+            DOWNLOAD_GAME_HERE/Garbhagriha-3D-Latest.apk
             DOWNLOAD_GAME_HERE/Garbhagriha-Game.apk
 
       - name: Upload Freshly Built Play Store Bundle (AAB + Keystore)
