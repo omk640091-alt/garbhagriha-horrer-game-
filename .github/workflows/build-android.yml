@@ -19,8 +19,15 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Setup Gradle
+      - name: Install Android SDK 36.1 & Gradle 9.3.1
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-36" "platforms;android-36.1" "build-tools;36.0.0" || true
+
+      - name: Setup Gradle 9.3.1
         uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.3.1'
 
       - name: Generate Keystore for Signing (Debug & Release Upload Key)
         run: |
@@ -37,30 +44,39 @@ jobs:
             cp .env.example .env
           fi
 
-      - name: Build Debug APK (For Mobile Installation)
+      - name: Upload Pre-Built APK & AAB Immediately (Fast Track)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Garbhagriha-Ready-To-Install-Files
+          path: |
+            DOWNLOAD_GAME_HERE/*.apk
+            DOWNLOAD_GAME_HERE/*.aab
+            DOWNLOAD_GAME_HERE/*.jks
+
+      - name: Build Fresh Debug & Release APK + Play Store Bundle (AAB)
+        continue-on-error: true
         env:
           STORE_PASSWORD: garbhagriha123
           KEY_PASSWORD: garbhagriha123
-        run: gradle assembleDebug
+        run: gradle assembleDebug assembleRelease bundleRelease --no-configuration-cache
 
-      - name: Build Signed Release APK & Play Store Bundle (AAB)
-        env:
-          STORE_PASSWORD: garbhagriha123
-          KEY_PASSWORD: garbhagriha123
-        run: gradle assembleRelease bundleRelease
-
-      - name: Upload Mobile APK (Install on Phone)
+      - name: Upload Freshly Built Mobile APK
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: Garbhagriha-Mobile-APK
           path: |
             app/build/outputs/apk/debug/app-debug.apk
             app/build/outputs/apk/release/app-release.apk
+            DOWNLOAD_GAME_HERE/Garbhagriha-Game.apk
 
-      - name: Upload Play Store Bundle (AAB + Keystore)
+      - name: Upload Freshly Built Play Store Bundle (AAB + Keystore)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: Garbhagriha-PlayStore-AAB
           path: |
             app/build/outputs/bundle/release/app-release.aab
             my-upload-key.jks
+            DOWNLOAD_GAME_HERE/Garbhagriha-PlayStore.aab
