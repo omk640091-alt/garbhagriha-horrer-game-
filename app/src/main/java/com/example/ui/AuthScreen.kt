@@ -105,7 +105,8 @@ fun attemptAutoSignIn(
 
   scope.launch {
     try {
-      val result = credentialManager.getCredential(context, request)
+      val activityContext = context as? Activity ?: context
+      val result = credentialManager.getCredential(activityContext, request)
       val credential = result.credential
       if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
         val googleIdToken = GoogleIdTokenCredential.createFrom(credential.data).idToken
