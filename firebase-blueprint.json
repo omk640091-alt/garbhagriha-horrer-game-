@@ -1,0 +1,232 @@
+{
+  "entities": {
+    "UserProgress": {
+      "title": "UserProgress",
+      "description": "Tracks a Sanatani explorer's spiritual progress, unlocked temple lore, and completed rituals.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated user UID."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Explorer display name."
+        },
+        "sanctumsCleansed": {
+          "type": "integer",
+          "description": "Number of temple sanctums cleansed."
+        },
+        "diyasLit": {
+          "type": "integer",
+          "description": "Total sacred oil lamps lit across expeditions."
+        },
+        "puzzlesSolved": {
+          "type": "integer",
+          "description": "Total ancient temple puzzles solved."
+        },
+        "highestSurvivalSec": {
+          "type": "integer",
+          "description": "Longest survival duration in a cursed sanctum in seconds."
+        },
+        "unlockedCodexIds": {
+          "type": "array",
+          "description": "Bounded list of unlocked mythological creature and temple lore IDs."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of profile creation via FieldValue.serverTimestamp()."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update via FieldValue.serverTimestamp()."
+        }
+      },
+      "required": [
+        "userId",
+        "displayName",
+        "sanctumsCleansed",
+        "diyasLit",
+        "puzzlesSolved",
+        "highestSurvivalSec",
+        "unlockedCodexIds",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ExpeditionRoom": {
+      "title": "ExpeditionRoom",
+      "description": "Online multiplayer co-op horror expedition room in a cursed ancient temple.",
+      "type": "object",
+      "properties": {
+        "roomCode": {
+          "type": "string",
+          "description": "6-character alphanumeric room code."
+        },
+        "templeId": {
+          "type": "string",
+          "description": "Identifier of the temple (brihadeeswarar, konark, kailasa)."
+        },
+        "templeName": {
+          "type": "string",
+          "description": "Display name of the temple."
+        },
+        "entityName": {
+          "type": "string",
+          "description": "Name of the mythological guardian/entity haunting the temple."
+        },
+        "hostUid": {
+          "type": "string",
+          "description": "UID of the expedition host."
+        },
+        "hostName": {
+          "type": "string",
+          "description": "Display name of the host."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["waiting", "active", "escaped", "consumed"],
+          "description": "Current room status."
+        },
+        "diyasLitCount": {
+          "type": "integer",
+          "description": "Shared number of sacred Diyas lit in the sanctum (0 to 5)."
+        },
+        "sealsUnlocked": {
+          "type": "integer",
+          "description": "Shared number of ancient Vedic seals unlocked (0 to 3)."
+        },
+        "entityX": {
+          "type": "number",
+          "description": "Current X coordinate of the hunting mythological creature."
+        },
+        "entityY": {
+          "type": "number",
+          "description": "Current Y coordinate of the hunting mythological creature."
+        },
+        "entityAlertLevel": {
+          "type": "integer",
+          "description": "Aggression / chase alert level of the creature (0 to 100)."
+        },
+        "lastRitualEvent": {
+          "type": "string",
+          "description": "Latest shared co-op event message (e.g., bell rung, mantra chanted, seal solved)."
+        },
+        "memberUids": {
+          "type": "array",
+          "description": "Bounded list of up to 4 participating player UIDs."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when room was created via FieldValue.serverTimestamp()."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of latest state sync via FieldValue.serverTimestamp()."
+        }
+      },
+      "required": [
+        "roomCode",
+        "templeId",
+        "templeName",
+        "entityName",
+        "hostUid",
+        "hostName",
+        "status",
+        "diyasLitCount",
+        "sealsUnlocked",
+        "entityX",
+        "entityY",
+        "entityAlertLevel",
+        "lastRitualEvent",
+        "memberUids",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "PlayerPresence": {
+      "title": "PlayerPresence",
+      "description": "Real-time position, torch state, and prana vitality of a player inside an ExpeditionRoom.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated player UID."
+        },
+        "roomCode": {
+          "type": "string",
+          "description": "6-character code of the room this presence belongs to."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Player display name."
+        },
+        "x": {
+          "type": "number",
+          "description": "Player X coordinate in temple grid."
+        },
+        "y": {
+          "type": "number",
+          "description": "Player Y coordinate in temple grid."
+        },
+        "angle": {
+          "type": "number",
+          "description": "Player facing angle in radians."
+        },
+        "prana": {
+          "type": "integer",
+          "description": "Spiritual vitality / sanity (0 to 100)."
+        },
+        "diyaLit": {
+          "type": "boolean",
+          "description": "Whether the player's brass Diya lamp is currently burning."
+        },
+        "chantingMantra": {
+          "type": "boolean",
+          "description": "Whether the player is actively chanting a protective Vedic mantra."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of presence update via FieldValue.serverTimestamp()."
+        }
+      },
+      "required": [
+        "userId",
+        "roomCode",
+        "displayName",
+        "x",
+        "y",
+        "angle",
+        "prana",
+        "diyaLit",
+        "chantingMantra",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProgress"
+      },
+      "description": "Stores personal progress, statistics, and unlocked codex entries for each authenticated user."
+    },
+    "/expedition_rooms/{roomId}": {
+      "schema": {
+        "$ref": "#/entities/ExpeditionRoom"
+      },
+      "description": "Stores active and joinable multiplayer temple horror co-op rooms."
+    },
+    "/expedition_rooms/{roomId}/players/{playerId}": {
+      "schema": {
+        "$ref": "#/entities/PlayerPresence"
+      },
+      "description": "Stores real-time telemetry and ritual states for each player in an expedition room."
+    }
+  }
+}

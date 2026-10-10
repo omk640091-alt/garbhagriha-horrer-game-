@@ -1,0 +1,6 @@
+{
+  "name": "Garbhagriha",
+  "description": "Sanatani Hindu adventure horror chase & puzzle game set in ancient Indian temples with mythological creatures, first-person exploration, realistic spatial audio, and online multiplayer.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
