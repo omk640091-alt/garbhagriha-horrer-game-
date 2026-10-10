@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout Source Code
@@ -47,40 +49,46 @@ jobs:
             cp .env.example .env
           fi
 
-      - name: Upload Pre-Built APK & AAB Immediately (Fast Track)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: Garbhagriha-Ready-To-Install-Files
-          path: |
-            DOWNLOAD_GAME_HERE/*.apk
-            DOWNLOAD_GAME_HERE/*.aab
-            DOWNLOAD_GAME_HERE/*.jks
-
-      - name: Build Fresh Debug & Release APK + Play Store Bundle (AAB)
-        continue-on-error: true
+      - name: Build Debug & Release APK + Play Store Bundle (AAB)
         env:
           STORE_PASSWORD: garbhagriha123
           KEY_PASSWORD: garbhagriha123
-        run: gradle assembleDebug assembleRelease bundleRelease --no-configuration-cache
+        run: |
+          gradle assembleDebug assembleRelease bundleRelease --no-configuration-cache
+          cp app/build/outputs/apk/debug/app-debug.apk Garbhagriha-3D-Mobile.apk
+          cp app/build/outputs/apk/release/app-release.apk Garbhagriha-3D-Release.apk
+          cp app/build/outputs/bundle/release/app-release.aab Garbhagriha-PlayStore.aab
 
-      - name: Upload Freshly Built Mobile APK
+      - name: Upload Mobile APK Artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: Garbhagriha-Mobile-APK
           path: |
-            app/build/outputs/apk/debug/app-debug.apk
-            app/build/outputs/apk/release/app-release.apk
-            DOWNLOAD_GAME_HERE/Garbhagriha-3D-Latest.apk
-            DOWNLOAD_GAME_HERE/Garbhagriha-Game.apk
+            Garbhagriha-3D-Mobile.apk
+            Garbhagriha-3D-Release.apk
 
-      - name: Upload Freshly Built Play Store Bundle (AAB + Keystore)
+      - name: Upload Play Store Bundle (AAB + Keystore)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: Garbhagriha-PlayStore-AAB
           path: |
-            app/build/outputs/bundle/release/app-release.aab
+            Garbhagriha-PlayStore.aab
             my-upload-key.jks
-            DOWNLOAD_GAME_HERE/Garbhagriha-PlayStore.aab
+
+      - name: Publish Direct Download Release on GitHub
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: "🪔 Garbhagriha 3D Game APK (Build #${{ github.run_number }})"
+          body: |
+            ### 📱 मोबाइल में सीधे इंस्टॉल करने के लिए नीचे `Garbhagriha-3D-Mobile.apk` पर टैप करें!
+            - **Mobile APK:** `Garbhagriha-3D-Mobile.apk` (सीधे फोन में इंस्टॉल करें)
+            - **Play Store Bundle:** `Garbhagriha-PlayStore.aab` (Google Play Console के लिए)
+          files: |
+            Garbhagriha-3D-Mobile.apk
+            Garbhagriha-3D-Release.apk
+            Garbhagriha-PlayStore.aab
+            my-upload-key.jks

@@ -1,23 +1,17 @@
-# 🪔 Garbhagriha: The LastSanctum (3D First-Person Horror Game)
+# 🪔 Garbhagriha: The Last Sanctum (3D First-Person Horror Game)
 
-## 📱 अपने मोबाइल (Android) में सीधे APK कैसे डाउनलोड करें?
+## 📱 अपने मोबाइल (Android) में APK कैसे डाउनलोड करें?
 
-जब आप इस प्रोजेक्ट को GitHub पर खोलें, तो सीधे नीचे दिए गए लिंक पर टैप करें और **Download** करें:
+जैसे ही यह प्रोजेक्ट GitHub पर Push होता है, GitHub खुद आपके लिए **APK** और **Play Store AAB** बनाकर **Releases** और **Actions** में डाल देता है:
 
-👉 **[DOWNLOAD_GAME_HERE/Garbhagriha-3D-Latest.apk](./DOWNLOAD_GAME_HERE/Garbhagriha-3D-Latest.apk)** *(इस पर क्लिक करें -> फिर `...` या `View raw` / `Download` आइकॉन दबाएँ)*
+### तरीका 1: GitHub Releases से (सीधा 1-क्लिक `.apk` डाउनलोड)
+1. इस GitHub पेज पर दाईं तरफ (या मोबाइल में थोड़ा नीचे स्क्रॉल करके) **"Releases"** सेक्शन पर टैप करें।
+2. सबसे ऊपर वाली रिलीज़ में **`Garbhagriha-3D-Mobile.apk`** पर टैप करें — APK तुरंत आपके फोन में डाउनलोड हो जाएगा!
 
----
-
-### दूसरे विकल्प (GitHub से डाउनलोड करने के तरीके):
-
-1. **फ़ोल्डर में जाकर (सबसे आसान):**
-   - इस रिपॉजिटरी में सबसे ऊपर **`DOWNLOAD_GAME_HERE`** फ़ोल्डर खोलें।
-   - उसके अंदर **`Garbhagriha-3D-Latest.apk`** पर टैप करें।
-   - ऊपर दाईं तरफ **तीन बिंदुओं (`...`)** या **Download (तीर का निशान)** पर टैप करें और **"Download"** चुनें।
-   - डाउनलोड पूरी होने पर फ़ाइल पर टैप करके अपने फोन में **Install** कर लें!
-
-2. **GitHub Actions से:**
-   - ऊपर **Actions** टैब पर जाएँ -> सबसे ऊपर वाली वर्कफ़्लो रन पर क्लिक करें -> नीचे **Artifacts** सेक्शन से `Garbhagriha-Ready-To-Install-Files` डाउनलोड करें।
+### तरीका 2: GitHub Actions से
+1. ऊपर **Actions** टैब पर टैप करें।
+2. सबसे ऊपर चल रहे/पूरे हो चुके **Build APK & Play Store AAB** वर्कफ़्लो पर टैप करें।
+3. नीचे **Artifacts** में **`Garbhagriha-Mobile-APK`** पर टैप करके डाउनलोड कर लें।
 
 ---
 
